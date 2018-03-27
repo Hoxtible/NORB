@@ -43,6 +43,14 @@ class Boi:
 
         if self.up_is_pressed:
             self.vy -= 900
+        if self.x > 600:
+            self.x = 0
+        if self.x < 0:
+            self.x = 600
+        if self.y > 600:
+            self.y = 0
+        if self.y < 0:
+            self.y = 600
 
         self.x = self.x + self.vx * delta_T
         self.y = self.y + self.vy * delta_T

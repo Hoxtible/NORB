@@ -1,16 +1,16 @@
-__author__ = 'peter'
-import pygame
+__author__ = 'yournamehere'
+import pygame, random
 
 
-class Pew:
+class Buggiboi:
     def __init__(self):
         """
         This is where we set up the variables for this particular object as soon as it is created.
         """
-        self.x = 400
-        self.y = 300
-        self.vx = 0
-        self.vy = 0
+        self.x = random.randrange(0,600)
+        self.y = random.randrange(0,600)
+        self.vx = random.randrange(0,100)
+        self.vy = random.randrange(0,100)
         self.i_am_alive = True
 
     def draw_self(self, surface):
@@ -19,8 +19,7 @@ class Pew:
         :param surface:
         :return: None
         """
-        pygame.draw.rect(surface, pygame.Color("black"), (self.x - 5, self.y - 5, 10, 10))
-        pass
+        pygame.draw.rect(surface, pygame.Color("green"), (self.x - 5, self.y - 5, 10, 10))
 
     def step(self, delta_T):
         """
@@ -29,18 +28,16 @@ class Pew:
         :param delta_T:
         :return: None
         """
-        if self.x > 600:
-            self.die()
-        if self.y > 600:
-            self.die()
-        if self.x < 0:
-            self.die()
-        if self.y < 0:
-            self.die()
-
-
         self.x = self.x + self.vx * delta_T
         self.y = self.y + self.vy * delta_T
+        if self.x > 600:
+            self.x = 0
+        if self.x < 0:
+            self.x = 600
+        if self.y > 600:
+            self.y = 0
+        if self.y < 0:
+            self.y = 600
     def is_dead(self):
         """
         lets another object know whether this object is still live and on the board. Used by the main loop to clear objects

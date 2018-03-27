@@ -5,6 +5,7 @@ from pygame.locals import *
 
 from shootyboi import Boi
 from pewpewboi import Pew
+from buggiboiz import Buggiboi
 GAME_MODE_MAIN = 0
 GAME_MODE_TITLE_SCREEN = 1
 
@@ -16,7 +17,7 @@ def setup():
     This happens once in the program, at the very beginning.
     """
     global buffer, objects_on_screen, objects_to_add, bg_color, game_mode
-    global shootyboi, pew, pew_list
+    global shootyboi, pew, pew_list, bug, bug_list
 
     global mouse_location
     buffer = pygame.display.set_mode((600, 600))
@@ -25,13 +26,20 @@ def setup():
                         #   are in the middle of the loop, and they will be added in later in the loop, when it is safe
                         #   to do so.
     pew_list = []
+    bug_list = []
     bg_color = pygame.Color("royalblue4")  # you can find a list of color names at https://goo.gl/KR7Pke
     game_mode = GAME_MODE_MAIN
     # Add any other things you would like to have the program do at startup here.
     mouse_location = [0,0]
     shootyboi = Boi()
     pew = Pew()
+    bug = Buggiboi()
     objects_on_screen.append(shootyboi)
+    for i in range(3):
+        new_bug = Buggiboi()
+        bug_list.append(new_bug)
+        objects_on_screen.append(new_bug)
+
 # =====================  loop()
 def loop(delta_T):
     """
@@ -52,7 +60,7 @@ def loop(delta_T):
         add_new_objects()
         draw_objects()
         show_stats(delta_T) #optional. Comment this out if it annoys you.
-
+        bug_shot()
     pygame.display.flip()  # updates the window to show the latest version of the buffer.
 
 
@@ -128,7 +136,11 @@ def shoot(to_x,to_y):
 
     print(bullet.vx)
     print(bullet.vy)
-
+def bug_shot():
+    global bug, pew
+    if bug.x == pew.x and bug.y == pew.y:
+        pew.die()
+        bug.die()
 
 def show_stats(delta_T):
     """
