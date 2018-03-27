@@ -1,9 +1,10 @@
 __author__ = 'yournamehere'  # put your name here!!!
 
-import pygame, sys, traceback, random
+import pygame, sys, traceback, random, math
 from pygame.locals import *
 
 from shootyboi import Boi
+from pewpewboi import Pew
 GAME_MODE_MAIN = 0
 GAME_MODE_TITLE_SCREEN = 1
 
@@ -15,16 +16,21 @@ def setup():
     This happens once in the program, at the very beginning.
     """
     global buffer, objects_on_screen, objects_to_add, bg_color, game_mode
-    global shootyboi
+    global shootyboi, pew, pew_list
+
+    global mouse_location
     buffer = pygame.display.set_mode((600, 600))
     objects_on_screen = []  # this is a list of all things that should be drawn on screen.
     objects_to_add = [] #this is a list of things that should be added to the list on screen. Put them here while you
                         #   are in the middle of the loop, and they will be added in later in the loop, when it is safe
                         #   to do so.
+    pew_list = []
     bg_color = pygame.Color("royalblue4")  # you can find a list of color names at https://goo.gl/KR7Pke
     game_mode = GAME_MODE_MAIN
     # Add any other things you would like to have the program do at startup here.
+    mouse_location = [0,0]
     shootyboi = Boi()
+    pew = Pew()
     objects_on_screen.append(shootyboi)
 # =====================  loop()
 def loop(delta_T):
@@ -95,6 +101,35 @@ def draw_objects():
         object.draw_self(buffer)
 
 # =====================  show_stats()
+
+
+
+def shoot(to_x,to_y):
+    global objects_on_screen, pew, shootyboi, pew_list
+    boi_x = shootyboi.x
+    boi_y = shootyboi.y
+    bullet = Pew()
+    objects_on_screen.append(bullet)
+    bullet.x = boi_x
+    bullet.y = boi_y
+    dx = abs(to_x - boi_x)
+    dy = abs(to_y - boi_y)
+    d = math.sqrt(dx*dx + dy*dy)
+    if boi_x > to_x:
+
+        bullet.vx = -dx
+    else:
+        bullet.vx = dx
+    if boi_y > to_y:
+
+        bullet.vy = -dy
+    else:
+        bullet.vy = dy
+
+    print(bullet.vx)
+    print(bullet.vy)
+
+
 def show_stats(delta_T):
     """
     draws the frames-per-second in the lower-left corner and the number of objects on screen in the lower-right corner.
@@ -122,9 +157,11 @@ def show_stats(delta_T):
 
 # =====================  read_events()
 def read_events():
+
     """
-    checks the list of events and determines whether to respond to one.
-    """
+checks the list of events and determines whether to respond to one.
+"""
+    global mouse_location
     events = pygame.event.get()  # get the list of all events since the last time
     for evt in events:
         if evt.type == QUIT:
@@ -155,7 +192,10 @@ def read_events():
                 shootyboi.up_is_pressed = False
             if evt.key == K_s:
                 shootyboi.down_is_pressed = False
-
+        if evt.type == MOUSEBUTTONDOWN:
+            mouse_location = evt.pos
+            print("meme")
+            shoot(mouse_location[0],mouse_location[1])
 
 
 # program start with game loop - this is what makes the loop() actually loop.

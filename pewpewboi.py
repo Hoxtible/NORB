@@ -2,7 +2,7 @@ __author__ = 'yournamehere'
 import pygame
 
 
-class Boi:
+class Pew:
     def __init__(self):
         """
         This is where we set up the variables for this particular object as soon as it is created.
@@ -12,17 +12,15 @@ class Boi:
         self.vx = 0
         self.vy = 0
         self.i_am_alive = True
-        self.left_is_pressed = False
-        self.right_is_pressed = False
-        self.down_is_pressed = False
-        self.up_is_pressed = False
+
     def draw_self(self, surface):
         """
         It is this object's responsibility to draw itself on the surface. It will be told to do this often!
         :param surface:
         :return: None
         """
-        pygame.draw.rect(surface, pygame.Color("red"), (self.x - 5, self.y - 5, 10, 10))
+        pygame.draw.rect(surface, pygame.Color("black"), (self.x - 5, self.y - 5, 10, 10))
+        pass
 
     def step(self, delta_T):
         """
@@ -31,18 +29,11 @@ class Boi:
         :param delta_T:
         :return: None
         """
-        self.vx = 0
-        self.vy = 0
-        if self.left_is_pressed:
-            self.vx -= 900
+        if self.x > 600:
+            self.die()
+        if self.y > 600:
+            self.die()
 
-        if self.right_is_pressed:
-            self.vx += 900
-        if self.down_is_pressed:
-            self.vy += 900
-
-        if self.up_is_pressed:
-            self.vy -= 900
 
         self.x = self.x + self.vx * delta_T
         self.y = self.y + self.vy * delta_T
