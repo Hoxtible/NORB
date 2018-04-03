@@ -43,18 +43,19 @@ class Boi:
 
         if self.up_is_pressed:
             self.vy -= 900
-        if self.x > 600:
-            self.x = 0
         if self.x < 0:
-            self.x = 600
-        if self.y > 600:
-            self.y = 0
+            self.x = 1
+        if self.x > 200:
+            self.x = 200
         if self.y < 0:
-            self.y = 600
+            self.y = 1
+        if self.y > 200:
+            self.y = 200
 
         self.x = self.x + self.vx * delta_T
         self.y = self.y + self.vy * delta_T
     def is_dead(self):
+
         """
         lets another object know whether this object is still live and on the board. Used by the main loop to clear objects
         in need of removal.

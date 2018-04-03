@@ -7,10 +7,10 @@ class Buggiboi:
         """
         This is where we set up the variables for this particular object as soon as it is created.
         """
-        self.x = random.randrange(0,600)
+        self.x = random.randrange(400,600)
         self.y = random.randrange(0,600)
-        self.vx = random.randrange(0,100)
-        self.vy = random.randrange(0,100)
+        self.vx = random.randrange(50,500)
+        self.vy = random.randrange(50,500)
         self.i_am_alive = True
 
     def draw_self(self, surface):
@@ -30,14 +30,17 @@ class Buggiboi:
         """
         self.x = self.x + self.vx * delta_T
         self.y = self.y + self.vy * delta_T
+        if self.x < 400:
+            self.x = 400
+            self.vx = self.vx * -1
+
         if self.x > 600:
-            self.x = 0
-        if self.x < 0:
-            self.x = 600
-        if self.y > 600:
-            self.y = 0
+            self.vx = self.vx * -1
+
         if self.y < 0:
-            self.y = 600
+            self.vy = self.vy * -1
+        if self.y > 600:
+            self.vy = self.vy * -1
     def is_dead(self):
         """
         lets another object know whether this object is still live and on the board. Used by the main loop to clear objects

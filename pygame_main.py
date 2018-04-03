@@ -17,7 +17,7 @@ def setup():
     This happens once in the program, at the very beginning.
     """
     global buffer, objects_on_screen, objects_to_add, bg_color, game_mode
-    global shootyboi, pew, pew_list, bug, bug_list
+    global shootyboi, pew, pew_list, bug, bug_list, bugs_shot, shots_fired
 
     global mouse_location
     buffer = pygame.display.set_mode((600, 600))
@@ -34,8 +34,10 @@ def setup():
     shootyboi = Boi()
     pew = Pew()
     bug = Buggiboi()
+    bugs_shot = 0
+    shots_fired = 0
     objects_on_screen.append(shootyboi)
-    for i in range(3):
+    for i in range(1):
         new_bug = Buggiboi()
         bug_list.append(new_bug)
         objects_on_screen.append(new_bug)
@@ -61,6 +63,7 @@ def loop(delta_T):
         draw_objects()
         show_stats(delta_T) #optional. Comment this out if it annoys you.
         bug_shot()
+
     pygame.display.flip()  # updates the window to show the latest version of the buffer.
 
 
@@ -89,6 +92,22 @@ def clear_dead_objects():
                                      #      ... they came back to you.
         else:
             i += 1
+    global pew_list
+    i = 0
+    for pew in pew_list[:]:
+        if pew.is_dead():
+            pew_list.pop(i)  # removes the ith object and pulls everything else inwards, so don't advance "i"
+            #      ... they came back to you.
+        else:
+            i += 1
+    global bug_list
+    i = 0
+    for bug in bug_list[:]:
+        if bug.is_dead():
+            bug_list.pop(i)  # removes the ith object and pulls everything else inwards, so don't advance "i"
+            #      ... they came back to you.
+        else:
+            i += 1
 
 # =====================  add_new_objects()
 def add_new_objects():
@@ -101,6 +120,11 @@ def add_new_objects():
     objects_to_add.clear()
 
 # =====================  draw_objects()
+def respawn_bug(amount_of_bugs):
+    for i in range(amount_of_bugs):
+        new_bug = Buggiboi()
+        bug_list.append(new_bug)
+        objects_on_screen.append(new_bug)
 def draw_objects():
     """
     Draws each object in the list of objects.
@@ -113,11 +137,12 @@ def draw_objects():
 
 
 def shoot(to_x,to_y):
-    global objects_on_screen, pew, shootyboi, pew_list
+    global objects_on_screen, pew, shootyboi, pew_list, shots_fired
     boi_x = shootyboi.x
     boi_y = shootyboi.y
     bullet = Pew()
     objects_on_screen.append(bullet)
+    pew_list.append(bullet)
     bullet.x = boi_x
     bullet.y = boi_y
     dx = abs(to_x - boi_x)
@@ -136,13 +161,30 @@ def shoot(to_x,to_y):
 
     print(bullet.vx)
     print(bullet.vy)
+    shots_fired += 1
 def bug_shot():
-    global bug, pew
-    if bug.x == pew.x and bug.y == pew.y:
-        pew.die()
-        bug.die()
+    global bugs_shot, bug_list, pew_list, objects_on_screen, shootyboi
+    for bug in bug_list:
+        for pew in pew_list:
+            if abs((pew.x - 0)-(bug.x - 0)) <=12 and abs((pew.y - 0)-(bug.y - 0)) <=12:
+                 print("BANG BANG")
+                 pew.die()
+                 bug.die()
+                 bugs_shot += 1
+                 respawn_bug(1)
+        if abs((shootyboi.x - 0) - (bug.x - 0)) <= 12 and abs((shootyboi.y - 0) - (bug.y - 0)) <= 12:
+            shootyboi.die()
+            death_screen()
+            
+def death_screen():
+    global objects_on_screen
+    for objects in objects_on_screen:
+        objects.die()
+
+
 
 def show_stats(delta_T):
+
     """
     draws the frames-per-second in the lower-left corner and the number of objects on screen in the lower-right corner.
     Note: the number of objects on screen may be a bit misleading. They still count even if they are being drawn off the
@@ -150,8 +192,10 @@ def show_stats(delta_T):
     :param delta_T: the time since the last time this loop happened, used to calculate fps.
     :return: None
     """
+    bugs_text = str(bugs_shot)
+    shot_text = str(shots_fired)
     white_color = pygame.Color(255,255,255)
-    stats_font = pygame.font.SysFont('Arial', 10)
+    stats_font = pygame.font.SysFont('Comic Sans MS', 10)
 
     fps_string = "FPS: {0:3.1f}".format(1.0/delta_T) #build a string with the calculation of FPS.
     fps_text_surface = stats_font.render(fps_string,True,white_color) #this makes a transparent box with text
@@ -166,6 +210,20 @@ def show_stats(delta_T):
     objects_text_rect.right = buffer.get_rect().right - 10 # move this box to the lower right corner
     objects_text_rect.bottom = buffer.get_rect().bottom - 10
     buffer.blit(objects_text_surface, objects_text_rect)
+
+    bugs_string = "Bugs Shot: {0}".format(bugs_text) # build a string with the number of objects
+    bugs_text_surface = stats_font.render(bugs_string, True, white_color)
+    bugs_text_rect = bugs_text_surface.get_rect()
+    bugs_text_rect.right = buffer.get_rect().right - 10  # move this box to the lower right corner
+    bugs_text_rect.top = buffer.get_rect().top + 10
+    buffer.blit(bugs_text_surface, bugs_text_rect)
+
+    shot_string = "Shots Fired: {0}".format(shot_text)  # build a string with the number of objects
+    shot_text_surface = stats_font.render(shot_string, True, white_color)
+    shot_text_rect = shot_text_surface.get_rect()
+    shot_text_rect.left = buffer.get_rect().left + 10  # move this box to the lower right corner
+    shot_text_rect.top = buffer.get_rect().top + 10
+    buffer.blit(shot_text_surface, shot_text_rect)
 
 # =====================  read_events()
 def read_events():
