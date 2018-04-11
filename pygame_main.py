@@ -17,7 +17,7 @@ def setup():
     This happens once in the program, at the very beginning.
     """
     global buffer, objects_on_screen, objects_to_add, bg_color, game_mode
-    global shootyboi, pew, pew_list, bug, bug_list, bugs_shot, shots_fired
+    global shootyboi, pew, pew_list, bug, bug_list, bugs_shot, shots_fired, game_over
 
     global mouse_location
     buffer = pygame.display.set_mode((600, 600))
@@ -34,6 +34,7 @@ def setup():
     shootyboi = Boi()
     pew = Pew()
     bug = Buggiboi()
+    game_over = False
     bugs_shot = 0
     shots_fired = 0
     objects_on_screen.append(shootyboi)
@@ -44,6 +45,7 @@ def setup():
 
 # =====================  loop()
 def loop(delta_T):
+    global clear_text
     """
      this is what determines what should happen over and over.
      delta_T is the time (in seconds) since the last loop() was called.
@@ -61,8 +63,10 @@ def loop(delta_T):
         clear_dead_objects()
         add_new_objects()
         draw_objects()
-        show_stats(delta_T) #optional. Comment this out if it annoys you.
+        if game_over == False:
+            show_stats(delta_T) #optional. Comment this out if it annoys you.
         bug_shot()
+        check_for_death()
 
     pygame.display.flip()  # updates the window to show the latest version of the buffer.
 
@@ -137,7 +141,7 @@ def draw_objects():
 
 
 def shoot(to_x,to_y):
-    global objects_on_screen, pew, shootyboi, pew_list, shots_fired
+    global objects_on_screen, pew, shootyboi, pew_list, shots_fired, game_over
     boi_x = shootyboi.x
     boi_y = shootyboi.y
     bullet = Pew()
@@ -177,9 +181,35 @@ def bug_shot():
             death_screen()
             
 def death_screen():
-    global objects_on_screen
+    global objects_on_screen, clear_text
+    clear_text = True
+    game_over_text()
     for objects in objects_on_screen:
         objects.die()
+def game_over_text():
+    global shots_fired, bugs_shot
+    stats_font = pygame.font.SysFont('Comic Sans MS', 60)
+    game_string = "Game Over"  # build a string with the number of objects
+    game_text_surface = stats_font.render(game_string, True, pygame.Color("Blue"))
+    game_text_rect = game_text_surface.get_rect()
+    game_text_rect.left = buffer.get_rect().left + 150  # move this box to the lower right corner
+    game_text_rect.top = buffer.get_rect().top + 250
+    buffer.blit(game_text_surface, game_text_rect)
+
+    percent_font = pygame.font.SysFont('Comic Sans MS', 30)
+    accuracy = bugs_shot/shots_fired *100
+    percent_string = "Accuracy: {0}%".format(accuracy)  # build a string with the number of objects
+    percent_text_surface = stats_font.render(percent_string, True, pygame.Color("Red"))
+    percent_text_rect = game_text_surface.get_rect()
+    percent_text_rect.left = buffer.get_rect().left + 100  # move this box to the lower right corner
+    percent_text_rect.top = buffer.get_rect().top + 300
+    buffer.blit(percent_text_surface, percent_text_rect)
+
+
+def check_for_death():
+    global shots_fired
+    if shots_fired > 100:
+        death_screen()
 
 
 
@@ -263,9 +293,10 @@ checks the list of events and determines whether to respond to one.
             if evt.key == K_s:
                 shootyboi.down_is_pressed = False
         if evt.type == MOUSEBUTTONDOWN:
-            mouse_location = evt.pos
-            print("meme")
-            shoot(mouse_location[0],mouse_location[1])
+            if game_over == False:
+                mouse_location = evt.pos
+                print("meme")
+                shoot(mouse_location[0],mouse_location[1])
 
 
 # program start with game loop - this is what makes the loop() actually loop.
