@@ -38,7 +38,7 @@ def setup():
     bugs_shot = 0
     shots_fired = 0
     objects_on_screen.append(shootyboi)
-    for i in range(1):
+    for i in range(2):
         new_bug = Buggiboi()
         bug_list.append(new_bug)
         objects_on_screen.append(new_bug)
@@ -145,6 +145,8 @@ def shoot(to_x,to_y):
     boi_x = shootyboi.x
     boi_y = shootyboi.y
     bullet = Pew()
+    pygame.mixer.music.load('shootsound.mp3')
+    pygame.mixer.play(0)
     objects_on_screen.append(bullet)
     pew_list.append(bullet)
     bullet.x = boi_x
@@ -170,16 +172,18 @@ def bug_shot():
     global bugs_shot, bug_list, pew_list, objects_on_screen, shootyboi
     for bug in bug_list:
         for pew in pew_list:
-            if abs((pew.x - 0)-(bug.x - 0)) <=12 and abs((pew.y - 0)-(bug.y - 0)) <=12:
+            if abs((pew.x - 0)-(bug.x - 0)) <=12 and abs((pew.y - 0)-(bug.y - 0)) <=12: 
                  print("BANG BANG")
                  pew.die()
                  bug.die()
+                 pygame.mixer.music.load('deathsound.mp3')
+                 pygame.mixer.play(0)
                  bugs_shot += 1
                  respawn_bug(1)
         if abs((shootyboi.x - 0) - (bug.x - 0)) <= 12 and abs((shootyboi.y - 0) - (bug.y - 0)) <= 12:
             shootyboi.die()
             death_screen()
-            
+
 def death_screen():
     global objects_on_screen, clear_text
     clear_text = True
@@ -261,7 +265,7 @@ def read_events():
     """
 checks the list of events and determines whether to respond to one.
 """
-    global mouse_location
+    global mouse_location, pew_list
     events = pygame.event.get()  # get the list of all events since the last time
     for evt in events:
         if evt.type == QUIT:
@@ -294,9 +298,10 @@ checks the list of events and determines whether to respond to one.
                 shootyboi.down_is_pressed = False
         if evt.type == MOUSEBUTTONDOWN:
             if game_over == False:
-                mouse_location = evt.pos
-                print("meme")
-                shoot(mouse_location[0],mouse_location[1])
+                if len(pew_list) <= 3:
+                    mouse_location = evt.pos
+                    print("meme")
+                    shoot(mouse_location[0],mouse_location[1])
 
 
 # program start with game loop - this is what makes the loop() actually loop.
