@@ -146,7 +146,7 @@ def shoot(to_x,to_y):
     boi_y = shootyboi.y
     bullet = Pew()
     pygame.mixer.music.load('shootsound.mp3')
-    pygame.mixer.play(0)
+    pygame.mixer.music.play(0)
     objects_on_screen.append(bullet)
     pew_list.append(bullet)
     bullet.x = boi_x
@@ -177,7 +177,7 @@ def bug_shot():
                  pew.die()
                  bug.die()
                  pygame.mixer.music.load('deathsound.mp3')
-                 pygame.mixer.play(0)
+                 pygame.mixer.music.play(0)
                  bugs_shot += 1
                  respawn_bug(1)
         if abs((shootyboi.x - 0) - (bug.x - 0)) <= 12 and abs((shootyboi.y - 0) - (bug.y - 0)) <= 12:

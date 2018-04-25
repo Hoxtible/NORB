@@ -49,8 +49,8 @@ class Boi:
             self.x = 200
         if self.y < 0:
             self.y = 1
-        if self.y > 200:
-            self.y = 200
+        if self.y > 600:
+            self.y = 600
 
         self.x = self.x + self.vx * delta_T
         self.y = self.y + self.vy * delta_T
